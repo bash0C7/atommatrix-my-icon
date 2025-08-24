@@ -30,61 +30,27 @@ class Button
   end
 end
 
+bash_pattern = [
+  [112, 0, 2], [191, 0, 6], [158, 26, 5], [193, 0, 7], [170, 0, 3],
+  [163, 110, 73], [176, 20, 9], [200, 157, 94], [174, 50, 4], [202, 185, 154],
+  [191, 81, 22], [194, 64, 10], [158, 0, 3], [168, 38, 5], [156, 91, 77],
+  [201, 98, 13], [199, 0, 6], [194, 0, 9], [202, 97, 13], [179, 59, 10],
+  [179, 144, 110], [148, 74, 57], [162, 35, 14], [182, 150, 114], [175, 144, 111]
+].map do |rgb|
+  r, g, b = rgb
+  ((r << 16) | (g << 8) | b)
+end
+
 button = Button.new(39)
 button.on_press do
-  bash_pattern.dim!
-end
-
-class BashPattern
-  include Enumerable
-  
-  def initialize(&block)
-    original_data = [
-      [175, 144, 111], [182, 150, 114], [162, 35, 14], [148, 74, 57], [179, 144, 110],
-      [179, 59, 10], [202, 97, 13], [194, 0, 9], [199, 0, 6], [201, 98, 13],
-      [156, 91, 77], [168, 38, 5], [158, 0, 3], [194, 64, 10], [191, 81, 22],
-      [202, 185, 154], [174, 50, 4], [200, 157, 94], [176, 20, 9], [163, 110, 73],
-      [170, 0, 3], [193, 0, 7], [158, 26, 5], [191, 0, 6], [112, 0, 2]
-    ]
-    
-    hex_data = original_data.map do |rgb|
-      r, g, b = rgb
-      ((r << 16) | (g << 8) | b)
-    end
-    
-    if block
-      block.call(hex_data)
-    end
-    
-    @data = hex_data
-  end
-  
-  def each(&block)
-    @data.each(&block)
-  end
-  
-  def dim!
-    @data.map! do |hex|
-      r = (hex >> 16) & 0xff
-      g = (hex >> 8) & 0xff
-      b = hex & 0xff
-      r = (r * 90) / 100
-      g = (g * 90) / 100
-      b = (b * 90) / 100
-      (r << 16) | (g << 8) | b
-    end
-  end
-end
-
-bash_pattern = BashPattern.new do |hex_data|
-  hex_data.each_with_index do |_, i|
-    next if i >= 12
-    y, x = i.divmod(5)
-    dst_idx = (4 - y) * 5 + (4 - x)
-    next if i >= dst_idx
-    temp = hex_data[i]
-    hex_data[i] = hex_data[dst_idx]
-    hex_data[dst_idx] = temp
+  bash_pattern.map! do |hex|
+    r = (hex >> 16) & 0xff
+    g = (hex >> 8) & 0xff
+    b = hex & 0xff
+    r = (r * 90) / 100
+    g = (g * 90) / 100
+    b = (b * 90) / 100
+    (r << 16) | (g << 8) | b
   end
 end
 
@@ -96,26 +62,26 @@ patterns = [
     true, true, true, true, true,
     true, true, true, true, true,
     true, true, true, true, true], 1000],
-  [[true, true, false, false, false,
-    true, true, false, false, false,
-    true, true, true, true, false,
-    true, true, false, false, true,
-    true, true, true, true, false], 500],
-  [[false, true, true, true, false,
-    true, true, false, false, true,
-    true, true, true, true, true,
-    true, true, false, false, true,
-    true, true, false, false, true], 500],
-  [[false, true, true, true, false,
-    true, true, false, false, false,
-    false, true, true, true, false,
+  [[false, false, false, true, true,
     false, false, false, true, true,
-    false, true, true, true, false], 500],
-  [[true, true, false, false, false,
+    false, true, true, true, true,
+    true, false, false, true, true,
+    false, true, true, true, true], 500],
+  [[false, true, true, true, false,
+    true, false, false, true, true,
+    true, true, true, true, true,
+    true, false, false, true, true,
+    true, false, false, true, true], 500],
+  [[false, true, true, true, false,
+    false, false, false, true, true,
+    false, true, true, true, false,
     true, true, false, false, false,
-    true, true, true, true, false,
-    true, true, false, false, true,
-    true, true, false, false, true], 500]
+    false, true, true, true, false], 500],
+  [[false, false, false, true, true,
+    false, false, false, true, true,
+    false, true, true, true, true,
+    true, false, false, true, true,
+    true, false, false, true, true], 500]
 ].map do |bits, time|
   [bits.map { |x| x ? 0xffffff : 0x000000 }, time]
 end
