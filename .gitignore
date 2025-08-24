@@ -69,3 +69,4 @@ Thumbs.db
 
 /components/
 .claude/
+src_components/R2P2-ESP32/storage/home/app.rb
