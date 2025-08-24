@@ -137,7 +137,14 @@ rake -T
 ### メインファイル
 
 **`src_components/R2P2-ESP32/storage/home/app_int.rb`** - 内蔵LED用プログラム（通常用）
-**`src_components/R2P2-ESP32/storage/home/app_ext.rb`** - 外付けLED用プログラム（反転済み）
+- GPIO27接続、5x5マトリックス通常方向（0,0が左上）
+- bash文字が正常に読める向き
+
+**`src_components/R2P2-ESP32/storage/home/app_ext.rb`** - 外付けLED用プログラム（反転済み）  
+- GPIO32接続、5x5マトリックス180度回転方向（0,0が右下）
+- 物理的にLEDマトリックスを180度回転させた配置用
+- bash_patternとpatternsが全て180度回転済み
+
 - LEDパターンの定義とカスタマイズはこのファイルを編集
 
 ### 主要コンポーネント
@@ -181,9 +188,13 @@ src_components/R2P2-ESP32/storage/home/app_int.rbをもとに、bash_patternと�
 ```
 
 このプロンプトにより：
-- `bash_pattern`: 25色の配列が末尾から先頭に並び順を反転
-- `patterns`: 各5x5パターンが180度回転（縦横反転）
+- `bash_pattern`: 25色の配列が末尾から先頭に並び順を反転（5x5の(4,4)→(0,0)順）
+- `patterns`: 各5x5パターンが180度回転（縦横反転、(0,0)→(4,4)が(4,4)→(0,0)になる）
 - GPIO設定: 27（内蔵LED）から32（外付けLED）に変更
+
+**LEDマトリックス座標系**：
+- **app_int.rb**: 通常方向 - (0,0)左上、(4,4)右下、bash文字正読み
+- **app_ext.rb**: 180度回転 - (0,0)右下、(4,4)左上、bash文字が物理回転時に正読み
 
 ## カスタマイズのヒント
 
