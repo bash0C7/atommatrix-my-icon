@@ -3,7 +3,6 @@ require 'gpio'
 
 led = WS2812.new(RMTDriver.new(32))
 
-
 class Button
   HIGH = 1
   LOW = 0
