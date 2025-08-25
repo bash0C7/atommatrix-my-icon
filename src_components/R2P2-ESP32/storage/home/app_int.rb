@@ -10,6 +10,7 @@ class Button
   def initialize(pin)
     @gpio = GPIO.new(pin, GPIO::IN)
     @last_state = HIGH
+    @wait_count = 0
     @on_press_callback = Proc.new {}
   end
   
@@ -19,10 +20,12 @@ class Button
   
   def update
     current = @gpio.read
-    if @last_state == HIGH && current == LOW
+    if @last_state == HIGH && current == LOW && @wait_count == 0
+      @wait_count = 20
       @last_state = current
       @on_press_callback.call
     end
+    @wait_count -= 1 if @wait_count > 0
     @last_state = current
   end
 end
