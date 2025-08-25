@@ -98,6 +98,7 @@ loop do
     led.show_hex(*buffer)
     
     sleep_ms duration
+    button.update
 
     bash_pattern.each_with_index do |b, i|
       buffer[i] = 0x000000
