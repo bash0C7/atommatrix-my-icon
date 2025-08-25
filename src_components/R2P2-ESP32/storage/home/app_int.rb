@@ -10,7 +10,7 @@ class Button
   def initialize(pin)
     @gpio = GPIO.new(pin, GPIO::IN)
     @last_state = HIGH
-    @wait_count = 0
+    @pressed = false
     @on_press_callback = Proc.new {}
   end
   
@@ -20,12 +20,12 @@ class Button
   
   def update
     current = @gpio.read
-    if @last_state == HIGH && current == LOW && @wait_count == 0
-      @wait_count = 20
-      @last_state = current
+    if @last_state == HIGH && current == LOW && !@pressed
+      @pressed = true
       @on_press_callback.call
+    elsif current == HIGH
+      @pressed = false
     end
-    @wait_count -= 1 if @wait_count > 0
     @last_state = current
   end
 end
@@ -43,13 +43,14 @@ end
 
 button = Button.new(39)
 button.on_press do
+  puts "Button pressed! Dimming LEDs..."  # デバッグ用
   bash_pattern.map! do |hex|
     r = (hex >> 16) & 0xff
     g = (hex >> 8) & 0xff
     b = hex & 0xff
-    r = (r * 90) / 100
-    g = (g * 90) / 100
-    b = (b * 90) / 100
+    r = (r * 30) / 100  # 30%でさらに明確に
+    g = (g * 30) / 100
+    b = (b * 30) / 100
     (r << 16) | (g << 8) | b
   end
 end
